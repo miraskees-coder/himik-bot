@@ -22,7 +22,7 @@ bot/telegram.py      Telegram Bot API шақырулары
    - `TELEGRAM_BOT_TOKEN` — BotFather берген токен
    - `GEMINI_API_KEY` — Gemini API кілті
    - `TELEGRAM_SECRET_TOKEN` — өзіңіз ойлап тапқан құпия сөз (тек әріп, сан, `_`, `-`)
-   - `GEMINI_MODEL` — міндетті емес (әдепкі `gemini-2.5-flash`)
+   - `GEMINI_MODEL` — міндетті емес (әдепкі `gemini-flash-lite-latest`)
 3. **Deployments → Redeploy** басыңыз (айнымалылар күшіне енуі үшін).
 4. Браузерде бір рет ашыңыз:
    ```
