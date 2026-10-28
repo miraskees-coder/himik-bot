@@ -1,22 +1,17 @@
 """Telegram update-терін өңдейтін негізгі логика."""
 
 from bot import telegram
-from bot.faq import FAQ, FAQ_BY_ID, match
+from bot.faq import FAQ_BY_ID, match
 from bot.gemini import ask_gemini
 
 WELCOME = (
     "Сәлеметсіз бе, {name}! 👋\n\n"
-    "Мен — <b>ХИМИК</b> 🧪, химия бойынша көмекші ботпын.\n\n"
-    "• Төмендегі батырмалардан жиі қойылатын сұрақты таңдаңыз\n"
-    "• Немесе кез келген химиялық сұрағыңызды жай жазып жіберіңіз\n\n"
-    "Командалар: /faq — сұрақтар тізімі, /help — көмек"
+    "Мен — <b>ХИМИК</b> 🧪, химия бойынша көмекші ботпын.\n"
+    "Химия бойынша кез келген сұрағыңызды жазыңыз — жауап беремін."
 )
 
 HELP = (
     "<b>ХИМИК — көмек</b>\n\n"
-    "/start — басынан бастау\n"
-    "/faq — жиі қойылатын сұрақтар\n"
-    "/help — осы хабар\n\n"
     "Сұрағыңызды жай мәтінмен жазыңыз, мысалы:\n"
     "• <i>Күкірт қышқылының молярлық массасы қанша?</i>\n"
     "• <i>Fe + O₂ → Fe₂O₃ теңдеуін теңестір</i>\n"
@@ -27,44 +22,16 @@ ERROR_TEXT = "Кешіріңіз, қазір жауап бере алмадым 
 NON_TEXT = "Мен әзірге тек мәтіндік сұрақтарды түсінемін ✍️"
 
 
-def faq_keyboard():
-    return {
-        "inline_keyboard": [
-            [{"text": item["question"], "callback_data": f"faq:{item['id']}"}]
-            for item in FAQ
-        ]
-    }
-
-
-def back_keyboard():
-    return {"inline_keyboard": [[{"text": "📋 Барлық сұрақтар", "callback_data": "faq:list"}]]}
-
-
 def send_faq_answer(chat_id, item):
-    text = f"<b>❓ {item['question']}</b>\n\n{item['answer']}"
-    telegram.send_message(chat_id, text, parse_mode="HTML", reply_markup=back_keyboard())
-
-
-def send_faq_list(chat_id):
-    telegram.send_message(
-        chat_id,
-        "📋 <b>Жиі қойылатын сұрақтар</b>\n\nСұрақты таңдаңыз:",
-        parse_mode="HTML",
-        reply_markup=faq_keyboard(),
-    )
+    telegram.send_message(chat_id, item["answer"], parse_mode="HTML")
 
 
 def handle_callback(callback):
+    # Ескі хабарлардағы FAQ батырмалары үшін ғана қалдырылды.
     telegram.answer_callback_query(callback["id"])
     chat_id = callback["message"]["chat"]["id"]
-    data = callback.get("data", "")
-    if not data.startswith("faq:"):
-        return
-
-    faq_id = data.split(":", 1)[1]
-    if faq_id == "list":
-        send_faq_list(chat_id)
-    elif faq_id in FAQ_BY_ID:
+    faq_id = callback.get("data", "").removeprefix("faq:")
+    if faq_id in FAQ_BY_ID:
         send_faq_answer(chat_id, FAQ_BY_ID[faq_id])
 
 
@@ -81,10 +48,7 @@ def handle_message(message):
     if command == "/start":
         name = message.get("from", {}).get("first_name", "")
         name = name.replace("<", "").replace(">", "").replace("&", "")
-        telegram.send_message(chat_id, WELCOME.format(name=name), parse_mode="HTML",
-                              reply_markup=faq_keyboard())
-    elif command == "/faq":
-        send_faq_list(chat_id)
+        telegram.send_message(chat_id, WELCOME.format(name=name), parse_mode="HTML")
     elif command == "/help":
         telegram.send_message(chat_id, HELP, parse_mode="HTML")
     else:

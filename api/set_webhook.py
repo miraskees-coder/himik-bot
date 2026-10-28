@@ -12,7 +12,6 @@ from bot import telegram  # noqa: E402
 
 COMMANDS = [
     {"command": "start", "description": "Басынан бастау"},
-    {"command": "faq", "description": "Жиі қойылатын сұрақтар"},
     {"command": "help", "description": "Көмек"},
 ]
 
