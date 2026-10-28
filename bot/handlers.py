@@ -2,7 +2,7 @@
 
 from bot import telegram
 from bot.faq import FAQ_BY_ID, match
-from bot.gemini import ask_gemini
+from bot.ai import ask_ai
 
 WELCOME = (
     "Сәлеметсіз бе, {name}! 👋\n\n"
@@ -54,9 +54,9 @@ def handle_message(message):
     else:
         telegram.send_chat_action(chat_id)
         try:
-            answer = ask_gemini(text)
+            answer = ask_ai(text)
         except Exception as e:
-            print(f"Gemini error: {e!r}")
+            print(f"AI error: {e!r}")
             answer = None
 
         if answer:
