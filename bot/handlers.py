@@ -52,18 +52,20 @@ def handle_message(message):
     elif command == "/help":
         telegram.send_message(chat_id, HELP, parse_mode="HTML")
     else:
-        item = match(text)
-        if item:
-            send_faq_answer(chat_id, item)
-            return
-
         telegram.send_chat_action(chat_id)
         try:
-            answer = ask_gemini(text) or ERROR_TEXT
+            answer = ask_gemini(text)
         except Exception as e:
             print(f"Gemini error: {e!r}")
-            answer = ERROR_TEXT
-        telegram.send_message(chat_id, answer)
+            answer = None
+
+        if answer:
+            telegram.send_message(chat_id, answer)
+        elif item := match(text):
+            # Gemini жауап бермесе — дайын FAQ жауабы.
+            send_faq_answer(chat_id, item)
+        else:
+            telegram.send_message(chat_id, ERROR_TEXT)
 
 
 def handle_update(update: dict):

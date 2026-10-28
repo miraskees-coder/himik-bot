@@ -277,7 +277,7 @@ FAQ = [
 
 FAQ_BY_ID = {item["id"]: item for item in FAQ}
 
-# Ұзын сұрақтар (мысалы, нақты есеп) FAQ-қа емес, Gemini-ге жіберіледі.
+# Gemini қолжетімсіз болғанда ғана қолданылады: ұзын сұрақтарға FAQ жауабы сай келмейді.
 MAX_WORDS_FOR_MATCH = 7
 
 
@@ -302,3 +302,11 @@ def match(text: str):
         if score > best_score:
             best, best_score = item, score
     return best
+
+
+def faq_knowledge() -> str:
+    """Gemini-ге анықтамалық материал ретінде берілетін FAQ (HTML-сыз)."""
+    def plain(html: str) -> str:
+        return re.sub(r"<[^>]+>", "", html).replace("&lt;", "<").replace("&gt;", ">")
+
+    return "\n\n".join(f"### {item['question']}\n{plain(item['answer'])}" for item in FAQ)
